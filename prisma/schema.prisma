@@ -1,0 +1,265 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client_v15"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  companyName  String   @default("") @map("company_name")
+  address      String   @default("")
+  gstin        String   @default("")
+  phone        String   @default("")
+  companyEmail String   @default("") @map("company_email")
+  nextInvoiceNumber Int  @default(1) @map("next_invoice_number")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  products     Product[]
+  gstRates     GstRate[]
+  customers    Customer[]
+  invoices     Invoice[]
+  banks        BankAccount[]
+  expenses     Expense[]
+  attendance   Attendance[]
+  employees    Employee[]
+  employeeSalaries EmployeeSalary[]
+
+  @@map("users")
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  name          String
+  sku           String
+  hsnCode       String?  @map("hsn_code")
+  category      String   @default("Uncategorized")
+  salePrice     Decimal  @db.Decimal(12, 2) @map("sale_price")
+  purchasePrice Decimal  @db.Decimal(12, 2) @map("purchase_price")
+  stock         Int      @default(0)
+  unit          String   @default("pcs")
+  gst           Decimal  @db.Decimal(5, 2) @default(18)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gstRateId     String?  @map("gst_rate_id")
+  gstRate       GstRate? @relation(fields: [gstRateId], references: [id], onDelete: SetNull)
+  invoiceItems  InvoiceItem[]
+
+  @@unique([userId, sku])
+  @@index([userId, name])
+  @@index([gstRateId])
+  @@map("products")
+}
+
+model GstRate {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  name        String
+  percentage  Decimal   @db.Decimal(5, 2)
+  description String?
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products    Product[]
+
+  @@unique([userId, name])
+  @@unique([userId, percentage])
+  @@index([userId, isActive])
+  @@map("gst_rates")
+}
+
+model Customer {
+  id             String   @id @default(cuid())
+  userId         String   @map("user_id")
+  name           String
+  phone          String   @default("")
+  email          String   @default("")
+  gstin          String   @default("")
+  doorNumber     String   @default("") @map("door_number")
+  pan            String   @default("")
+  pincode        String   @default("")
+  billingAddress String   @default("") @map("billing_address")
+  openingBalance Decimal  @db.Decimal(12, 2) @default(0) @map("opening_balance")
+  notes          String   @default("")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, name])
+  @@index([userId, phone])
+  invoices      Invoice[]
+  @@map("customers")
+}
+
+enum InvoiceStatus {
+  ISSUED
+  PAID
+  PARTIAL
+  OVERDUE
+  VOID
+}
+
+enum InvoiceWorkflowStatus {
+  ISSUED
+  COMPLETED
+  CANCELLED
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  userId        String        @map("user_id")
+  customerId    String        @map("customer_id")
+  bankAccountId String?       @map("bank_account_id")
+  bankName      String        @default("") @map("bank_name")
+  accountName   String        @default("") @map("account_name")
+  accountNumber String        @default("") @map("account_number")
+  ifscCode      String        @default("") @map("ifsc_code")
+  branch        String        @default("")
+  invoiceNumber String        @map("invoice_number")
+  vehicleNumber String       @default("") @map("vehicle_number")
+  invoiceDate   DateTime      @db.Date @map("invoice_date")
+  dueDate       DateTime?     @db.Date @map("due_date")
+  status          InvoiceStatus @default(ISSUED)
+  workflowStatus  InvoiceWorkflowStatus @default(ISSUED) @map("workflow_status")
+  subtotal      Decimal       @db.Decimal(12, 2)
+  taxTotal      Decimal       @db.Decimal(12, 2) @map("tax_total")
+  grandTotal    Decimal       @db.Decimal(12, 2) @map("grand_total")
+  billingAddress  String        @default("") @map("billing_address")
+  shippingAddress String        @default("") @map("shipping_address")
+  notes         String        @default("")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  bankAccount   BankAccount?  @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+  items         InvoiceItem[]
+
+  @@index([userId, invoiceNumber])
+  @@index([userId, invoiceDate])
+  @@index([customerId, invoiceDate])
+  @@map("invoices")
+}
+
+model BankAccount {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  bankName      String    @map("bank_name")
+  accountName   String    @map("account_name")
+  accountNumber String    @map("account_number")
+  ifscCode      String    @map("ifsc_code")
+  branch        String    @default("")
+  upiId         String    @default("") @map("upi_id")
+  isDefault     Boolean   @default(false) @map("is_default")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices      Invoice[]
+
+  @@index([userId, isDefault])
+  @@map("bank_accounts")
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  title       String
+  category    String   @default("Other")
+  amount      Decimal  @db.Decimal(12, 2)
+  expenseDate DateTime @db.Date @map("expense_date")
+  paymentMode String   @default("Other") @map("payment_mode")
+  notes       String   @default("")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expenseDate])
+  @@index([userId, category])
+  @@map("expenses")
+}
+
+model Attendance {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  employee   String
+  date       DateTime @db.Date
+  status     String   @default("PRESENT")
+  checkIn    String   @default("") @map("check_in")
+  checkOut   String   @default("") @map("check_out")
+  notes      String   @default("")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, employee, date])
+  @@index([userId, date])
+  @@map("attendance")
+}
+
+model Employee {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  name        String
+  phone       String   @default("")
+  email       String   @default("")
+  address     String   @default("")
+  bloodGroup  String   @default("") @map("blood_group")
+  joinDate    DateTime @db.Date @map("join_date")
+  designation String   @default("")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  salaries    EmployeeSalary[]
+
+  @@unique([userId, name])
+  @@index([userId, joinDate])
+  @@map("employees")
+}
+
+model EmployeeSalary {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  employeeId String   @map("employee_id")
+  fromDate   DateTime @db.Date @map("from_date")
+  toDate     DateTime @db.Date @map("to_date")
+  amount     Decimal  @db.Decimal(12, 2)
+  notes      String   @default("")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([userId, fromDate, toDate])
+  @@index([employeeId, fromDate, toDate])
+  @@map("employee_salaries")
+}
+
+model InvoiceItem {
+  id            String   @id @default(cuid())
+  invoiceId     String   @map("invoice_id")
+  productId     String?  @map("product_id")
+  productName   String   @map("product_name")
+  sku           String   @default("")
+  hsnCode       String?  @map("hsn_code")
+  unit          String   @default("pcs")
+  quantity      Decimal  @db.Decimal(10, 3)
+  weight        Decimal? @db.Decimal(12, 3)
+  unitPrice     Decimal  @db.Decimal(12, 2) @map("unit_price")
+  gstRate       Decimal  @db.Decimal(5, 2) @map("gst_rate")
+  taxableAmount Decimal  @db.Decimal(12, 2) @map("taxable_amount")
+  taxAmount     Decimal  @db.Decimal(12, 2) @map("tax_amount")
+  lineTotal     Decimal  @db.Decimal(12, 2) @map("line_total")
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
+  @@map("invoice_items")
+}

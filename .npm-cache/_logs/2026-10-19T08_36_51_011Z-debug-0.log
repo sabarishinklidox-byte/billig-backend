@@ -1,0 +1,58 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Users\hp\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.4.2
+2 info using node@v22.19.0
+3 silly config load:file:C:\Users\hp\AppData\Roaming\npm\node_modules\npm\npmrc
+4 silly config load:file:D:\billing\backen\.npmrc
+5 silly config load:file:C:\Users\hp\.npmrc
+6 silly config load:file:C:\Users\hp\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install express@4.22.1 @prisma/client@6.19.3 bcryptjs@3.0.3 helmet@8.3.0 dotenv@17.4.2 cors@2.8.6 pg@8.21.0
+8 verbose argv "install" "express@4.22.1" "@prisma/client@6.19.3" "bcryptjs@3.0.3" "helmet@8.3.0" "dotenv@17.4.2" "cors@2.8.6" "pg@8.21.0" "--cache" ".npm-cache" "--prefer-offline"
+9 verbose logfile logs-max:10 dir:D:\billing\backen\.npm-cache\_logs\2026-10-19T08_36_51_011Z-
+10 verbose logfile D:\billing\backen\.npm-cache\_logs\2026-10-19T08_36_51_011Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET https://registry.npmjs.org/npm attempt 1 failed with ECONNREFUSED
+13 silly packumentCache heap:2197815296 maxSize:549453824 maxEntrySize:274726912
+14 silly idealTree buildDeps
+15 silly fetch manifest express@4.22.1
+16 silly packumentCache full:https://registry.npmjs.org/express cache-miss
+17 silly fetch manifest @prisma/client@6.19.3
+18 silly packumentCache full:https://registry.npmjs.org/@prisma%2fclient cache-miss
+19 silly fetch manifest bcryptjs@3.0.3
+20 silly packumentCache full:https://registry.npmjs.org/bcryptjs cache-miss
+21 silly fetch manifest helmet@8.3.0
+22 silly packumentCache full:https://registry.npmjs.org/helmet cache-miss
+23 silly fetch manifest dotenv@17.4.2
+24 silly packumentCache full:https://registry.npmjs.org/dotenv cache-miss
+25 silly fetch manifest cors@2.8.6
+26 silly packumentCache full:https://registry.npmjs.org/cors cache-miss
+27 silly fetch manifest pg@8.21.0
+28 silly packumentCache full:https://registry.npmjs.org/pg cache-miss
+29 silly placeDep ROOT @prisma/client@ OK for: backen@1.0.0 want: 6.19.3
+30 silly placeDep ROOT bcryptjs@ OK for: backen@1.0.0 want: 3.0.3
+31 silly placeDep ROOT cors@ OK for: backen@1.0.0 want: 2.8.6
+32 silly placeDep ROOT dotenv@ OK for: backen@1.0.0 want: 17.4.2
+33 silly placeDep ROOT express@ OK for: backen@1.0.0 want: 4.22.1
+34 silly placeDep ROOT helmet@ OK for: backen@1.0.0 want: 8.3.0
+35 silly placeDep ROOT pg@ OK for: backen@1.0.0 want: 8.21.0
+36 verbose stack Error: request to https://registry.npmjs.org/@prisma%2fclient failed: cache mode is 'only-if-cached' but no cached response is available.
+36 verbose stack     at cacheFetch (C:\Users\hp\AppData\Roaming\npm\node_modules\npm\node_modules\make-fetch-happen\lib\cache\index.js:12:13)
+36 verbose stack     at async fetch (C:\Users\hp\AppData\Roaming\npm\node_modules\npm\node_modules\make-fetch-happen\lib\fetch.js:98:7)
+36 verbose stack     at async RegistryFetcher.packument (C:\Users\hp\AppData\Roaming\npm\node_modules\npm\node_modules\pacote\lib\registry.js:90:19)
+36 verbose stack     at async RegistryFetcher.manifest (C:\Users\hp\AppData\Roaming\npm\node_modules\npm\node_modules\pacote\lib\registry.js:128:23)
+36 verbose stack     at async #fetchManifest (C:\Users\hp\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:1213:20)
+36 verbose stack     at async #nodeFromEdge (C:\Users\hp\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:1051:19)
+36 verbose stack     at async #buildDepStep (C:\Users\hp\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:915:11)
+36 verbose stack     at async Arborist.buildIdealTree (C:\Users\hp\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:182:7)
+36 verbose stack     at async Promise.all (index 1)
+36 verbose stack     at async Arborist.reify (C:\Users\hp\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:131:5)
+37 error code ENOTCACHED
+38 error request to https://registry.npmjs.org/@prisma%2fclient failed: cache mode is 'only-if-cached' but no cached response is available.
+39 silly unfinished npm timer reify 1792399011810
+40 silly unfinished npm timer reify:loadTrees 1792399011811
+41 verbose cwd D:\billing\backen
+42 verbose os Windows_NT 10.0.26300
+43 verbose node v22.19.0
+44 verbose npm  v11.4.2
+45 verbose exit 1
+46 verbose code 1
+47 error A complete log of this run can be found in: D:\billing\backen\.npm-cache\_logs\2026-10-19T08_36_51_011Z-debug-0.log
